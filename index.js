@@ -3,6 +3,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import authRouter from "./routes/auth.routes.js";
 
 dotenv.config();
 mongoose
@@ -22,6 +23,8 @@ app.use(morgan("dev"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use("/api/v1/auth", authRouter);
 
 app.use(async (err, req, res, next) => {
   err.status = err.status || 500;
