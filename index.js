@@ -1,6 +1,36 @@
 import express from "express";
+import morgan from "morgan";
+import helmet from "helmet";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 const app = express();
+
+app.use(helmet());
+
+app.use(morgan("dev"));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.use(async (err, req, res, next) => {
+  err.status = err.status || 500;
+  err.message = err.message || "Internal Server Error";
+  res.status(err.status).send({
+    status: err.status,
+    message: err.message,
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 
