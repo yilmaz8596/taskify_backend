@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import authRouter from "./routes/auth.routes.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 mongoose
@@ -18,6 +19,7 @@ mongoose
 
 const app = express();
 
+app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 
