@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-router.post("/register", validateUser, createUser);
+router.post("/register", createUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/verify/:verificationToken", verifyUser);

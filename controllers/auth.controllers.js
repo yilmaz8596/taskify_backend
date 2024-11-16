@@ -75,9 +75,7 @@ export const loginUser = async (req, res, next) => {
     }
 
     // Find user (case-insensitive)
-    const userExists = await User.findOne({
-      username: new RegExp(`^${username}$`, "i"),
-    });
+    const userExists = await User.findOne({ username: username });
     if (!userExists) {
       return next(createHttpError.NotFound("User does not exist"));
     }
