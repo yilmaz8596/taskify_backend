@@ -8,6 +8,7 @@ export const verifyUser = async (req, res, next) => {
       return next(createHttpError(401, "Unauthorized"));
     }
     req.user = decoded;
+    next();
   } catch (error) {
     console.error(error);
     return next(createHttpError(401, "Unauthorized"));

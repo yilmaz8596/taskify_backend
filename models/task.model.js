@@ -8,19 +8,20 @@ const taskSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      unique: true,
       trim: true,
     },
 
     subtitle: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
 
     objective: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
 
     description: {
@@ -58,9 +59,17 @@ const taskSchema = new mongoose.Schema(
     deadline: {
       type: Date,
       required: true,
+      set: function (value) {
+        if (typeof value === "string") {
+          const [day, month, year] = value.split(".");
+          return new Date(year, month - 1, day);
+        }
+        return value;
+      },
     },
-    user: {
+    userID: {
       type: mongoose.Schema.Types.ObjectId,
+      required: true,
       ref: "User",
     },
   },
@@ -69,7 +78,15 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-Task.statics.addPriorityLevel = function (newLevel) {
+taskSchema.pre("save", function (next) {
+  if (typeof this.deadline === "string") {
+    const [day, month, year] = this.deadline.split(".");
+    this.deadline = new Date(year, month - 1, day);
+  }
+  next();
+});
+
+taskSchema.statics.addPriorityLevel = function (newLevel) {
   if (priorityLevels.includes(newLevel)) {
     throw new Error("Priority level already exists");
   }
@@ -77,7 +94,7 @@ Task.statics.addPriorityLevel = function (newLevel) {
   this.path("priority").enum = priorityLevels;
 };
 
-Task.statics.editPriorityLevel = function (oldLevel, newLevel) {
+taskSchema.statics.editPriorityLevel = function (oldLevel, newLevel) {
   if (!priorityLevels.includes(oldLevel)) {
     throw new Error("Priority level does not exist");
   }
@@ -91,7 +108,7 @@ Task.statics.editPriorityLevel = function (oldLevel, newLevel) {
   this.path("priority").enum = priorityLevels;
 };
 
-Task.statics.deletePriorityLevel = function (level) {
+taskSchema.statics.deletePriorityLevel = function (level) {
   if (!priorityLevels.includes(level)) {
     throw new Error("Priority level does not exist");
   }
@@ -101,7 +118,7 @@ Task.statics.deletePriorityLevel = function (level) {
   this.path("priority").enum = priorityLevels;
 };
 
-Task.statics.addStatusLevel = function (newLevel) {
+taskSchema.statics.addStatusLevel = function (newLevel) {
   if (statusLevels.includes(newLevel)) {
     throw new Error("Status level already exists");
   }
@@ -109,7 +126,7 @@ Task.statics.addStatusLevel = function (newLevel) {
   this.path("status").enum = statusLevels;
 };
 
-Task.statics.editStatusLevel = function (oldLevel, newLevel) {
+taskSchema.statics.editStatusLevel = function (oldLevel, newLevel) {
   if (!statusLevels.includes(oldLevel)) {
     throw new Error("Status level does not exist");
   }
@@ -123,7 +140,7 @@ Task.statics.editStatusLevel = function (oldLevel, newLevel) {
   this.path("status").enum = statusLevels;
 };
 
-Task.statics.deleteStatusLevel = function (level) {
+taskSchema.statics.deleteStatusLevel = function (level) {
   if (!statusLevels.includes(level)) {
     throw new Error("Status level does not exist");
   }
@@ -133,18 +150,18 @@ Task.statics.deleteStatusLevel = function (level) {
   this.path("status").enum = statusLevels;
 };
 
-Task.statics.addNewAdditionalNote = function (note) {
+taskSchema.statics.addNewAdditionalNote = function (note) {
   this.path("additionalNotes").default.push(note);
 };
 
-Task.statics.deleteAdditionalNote = function (note) {
+taskSchema.statics.deleteAdditionalNote = function (note) {
   const index = this.path("additionalNotes").default.findIndex(
     (n) => n === note
   );
   this.path("additionalNotes").default.splice(index, 1);
 };
 
-Task.statics.editDeadline = function (newDeadline) {
+taskSchema.statics.editDeadline = function (newDeadline) {
   this.path("deadline").default = newDeadline;
 };
 
