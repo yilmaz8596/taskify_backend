@@ -3,19 +3,36 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    googleId: {
+      type: String,
+    },
+    githubId: {
+      type: String,
+    },
+    provider: {
+      type: String,
+      enum: ["local", "github"],
+      default: "local",
+    },
     firstname: {
       type: String,
-      required: true,
+      required: function () {
+        return this.provider === "local";
+      },
       trim: true,
     },
     lastname: {
       type: String,
-      required: true,
+      required: function () {
+        return this.provider === "local";
+      },
       trim: true,
     },
     username: {
       type: String,
-      required: true,
+      required: function () {
+        return this.provider === "local";
+      },
       trim: true,
       unique: true,
     },
@@ -27,7 +44,9 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.provider === "local";
+      },
     },
     verificationToken: {
       type: String,
