@@ -53,6 +53,9 @@ export const createTask = async (req, res, next) => {
         title: task.title,
         description: task.description,
         deadline: task.deadline,
+        subtitle: task.subtitle,
+        objective: task.objective,
+        category: task.category,
       },
     });
   } catch (error) {
